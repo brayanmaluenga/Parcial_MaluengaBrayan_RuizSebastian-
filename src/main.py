@@ -30,65 +30,116 @@ def comprobar_condiciones(condiciones, variables):
     return True
 
 
+
 def jugar(historia):
-    escena_actual = historia["inicio"]
-
-    # Copiamos las variables iniciales para no modificar la historia original.
-    variables = historia["variables"].copy()
-
     print(f"\n=== {historia['titulo']} ===")
 
     while True:
-        escena = buscar_escena(historia, escena_actual)
+        # Reiniciar el estado de una nueva partida.
+        escena_actual = historia["inicio"]
+        variables = historia["variables"].copy()
+        historial_deshacer = None
 
-        print("\n" + "=" * 50)
-        print(f"[{escena['id']}]")
-        print(escena["texto"])
-
-        # Si la escena es final, termina la partida.
-        if escena["final"]:
-            print("\nFIN DE LA TRANSMISIÓN")
-            break
-
-        # Mostrar solamente las opciones cuyas condiciones se cumplen.
-        opciones_disponibles = []
-
-        for opcion in escena["opciones"]:
-            condiciones = opcion["condiciones"]
-
-            if comprobar_condiciones(condiciones, variables):
-                opciones_disponibles.append(opcion)
-
-        if not opciones_disponibles:
-            print("Error: no hay opciones disponibles.")
-            break
-
-        for numero, opcion in enumerate(opciones_disponibles, start=1):
-            print(f"{numero}. {opcion['texto']}")
-
-        # Solicitar una opción válida.
         while True:
-            respuesta = input("\nSelecciona una opción: ")
+            escena = buscar_escena(historia, escena_actual)
 
-            try:
-                seleccion = int(respuesta)
+            print("\n" + "=" * 50)
+            print(f"[{escena['id']}]")
+            print(escena["texto"])
 
-                if 1 <= seleccion <= len(opciones_disponibles):
+            # En un final, todavía se puede deshacer la última elección.
+            if escena["final"]:
+                print("\n[r] Reiniciar partida")
+                print("[s] Salir")
+
+                if historial_deshacer is not None:
+                    print("[d] Deshacer última decisión")
+
+                respuesta = input("Selecciona una acción: ").strip().lower()
+
+                if respuesta == "d":
+                    if historial_deshacer is None:
+                        print("No hay ninguna decisión para deshacer.")
+                        continue
+
+                    escena_actual = historial_deshacer["escena"]
+                    variables = historial_deshacer["variables"].copy()
+
+                    # El retroceso se consume.
+                    historial_deshacer = None
+
+                    print("Decisión deshecha.")
+                    continue
+
+                if respuesta == "r":
+                    # El bucle exterior inicia una partida limpia.
+                    print("Reiniciando partida...")
                     break
 
-                print("Selecciona un número de las opciones mostradas.")
+                if respuesta == "s":
+                    print("Gracias por jugar. Fin de la transmisión.")
+                    return
 
+                print("Acción inválida. Intenta nuevamente.")
+                continue
+
+            opciones_disponibles = []
+
+            for opcion in escena["opciones"]:
+                condiciones = opcion["condiciones"]
+
+                if comprobar_condiciones(condiciones, variables):
+                    opciones_disponibles.append(opcion)
+
+            for numero, opcion in enumerate(
+                opciones_disponibles, start=1
+            ):
+                print(f"{numero}. {opcion['texto']}")
+
+            print("[d] Deshacer última decisión")
+
+            respuesta = input("\nSelecciona una opción: ").strip().lower()
+
+            if respuesta == "d":
+                if historial_deshacer is None:
+                    print("No hay ninguna decisión para deshacer.")
+                    continue
+
+                escena_actual = historial_deshacer["escena"]
+                variables = historial_deshacer["variables"].copy()
+
+                # Solo se permite un retroceso por elección válida.
+                historial_deshacer = None
+
+                print("Decisión deshecha.")
+                continue
+
+            # Validar que la entrada sea un número.
+            try:
+                seleccion = int(respuesta)
             except ValueError:
-                print("Entrada inválida. Debes escribir un número.")
+                print("Entrada inválida. Escribe un número o d.")
+                continue
 
-        opcion_elegida = opciones_disponibles[seleccion - 1]
+            if not 1 <= seleccion <= len(opciones_disponibles):
+                print("Opción inválida o no habilitada.")
+                continue
 
-        # Aplicar los efectos de la decisión.
-        for nombre, valor in opcion_elegida["efectos"].items():
-            variables[nombre] = valor
+            opcion_elegida = opciones_disponibles[seleccion - 1]
 
-        # Avanzar a la siguiente escena.
-        escena_actual = opcion_elegida["destino"]
+            # Guardar el estado ANTERIOR a la elección válida.
+            historial_deshacer = {
+                "escena": escena_actual,
+                "variables": variables.copy()
+            }
+
+            # Aplicar los efectos de la elección.
+            for nombre, valor in opcion_elegida["efectos"].items():
+                variables[nombre] = valor
+
+            # Avanzar a la escena de destino.
+            escena_actual = opcion_elegida["destino"]
+
 
 
 def validar_historia(historia):

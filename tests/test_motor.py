@@ -1,15 +1,20 @@
 
+
+
+
+
 import json
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
+from contextlib import redirect_stdout
+from io import StringIO
 
-# Permite importar el código ubicado en src.
-sys.path.insert(
-    0, str(Path(__file__).resolve().parent.parent / "src")
-)
+RUTA_SRC = Path(__file__).resolve().parent.parent / "src"
+sys.path.insert(0, str(RUTA_SRC))
 
-from main import cargar_historia, validar_historia
+from main import cargar_historia, validar_historia, jugar
 
 
 class TestMotorNarrativo(unittest.TestCase):
@@ -59,6 +64,82 @@ class TestMotorNarrativo(unittest.TestCase):
         self.assertTrue(
             any("duplicados" in error.lower() for error in errores)
         )
+
+
+    def test_U6_deshacer_restaurar_estado_y_consumir_historial(self):
+        # Cargar la historia real del profesor.
+        salida = StringIO()
+
+        # Investigar, intentar una opción inválida, deshacer,
+        # intentar deshacer otra vez, continuar sin investigar,
+        # elegir un final, deshacer desde ese final y salir.
+        entradas = [
+            "1", "1", "99", "d", "d",
+            "2", "1", "d", "2", "s"
+        ]
+
+        with patch("builtins.input", side_effect=entradas):
+            with redirect_stdout(salida):
+                jugar(self.historia)
+
+        resultado = salida.getvalue()
+
+        # La entrada inválida no debe impedir el retroceso.
+        self.assertIn("Opción inválida o no habilitada.", resultado)
+
+        # El segundo retroceso debe rechazarse.
+        self.assertIn("No hay ninguna decisión para deshacer.", resultado)
+
+        # La nueva elección debe volver a habilitar el retroceso.
+        self.assertGreaterEqual(
+            resultado.count("Decisión deshecha."), 2
+        )
+
+        # Se puede deshacer desde un final y volver a E3.
+        self.assertIn("[E5]", resultado)
+        self.assertIn("[E3]", resultado)
+
+        # Tras deshacer la investigación, se debe poder continuar
+        # sin investigar y activar la antena sin verificar.
+        self.assertIn("Activar sin verificar", resultado)
+
+    def test_U5_reiniciar_elimina_el_historial(self):
+        salida = StringIO()
+
+        # Llegar a un final, reiniciar y comprobar que en E1
+        # ya no existe una decisión que pueda deshacerse.
+        entradas = [
+            "1", "1", "1", "r",
+            "d", "1", "d", "1", "2", "2", "s"
+        ]
+
+        with patch("builtins.input", side_effect=entradas):
+            with redirect_stdout(salida):
+                jugar(self.historia)
+
+        resultado = salida.getvalue()
+
+        self.assertIn("Reiniciando partida...", resultado)
+        self.assertIn("No hay ninguna decisión para deshacer.", resultado)
+
+    
+    def test_I1_deshacer_desde_final_con_historia_cargada(self):
+        salida = StringIO()
+
+        # Continuar sin investigar permite llegar a E5.
+        # Desde E5, deshacer debe regresar a E3.
+        entradas = ["1", "2", "1", "d", "2", "s"]
+
+        with patch("builtins.input", side_effect=entradas):
+            with redirect_stdout(salida):
+                jugar(self.historia)
+
+        resultado = salida.getvalue()
+
+        self.assertIn("[E5]", resultado)
+        self.assertIn("Decisión deshecha.", resultado)
+        self.assertIn("[E3]", resultado)
+        self.assertIn("[E6]", resultado)
 
 
 if __name__ == "__main__":
