@@ -1,0 +1,54 @@
+{
+  "titulo": "Historia de prueba para bloqueo",
+  "inicio": "P1",
+  "variables": {
+    "llave": false
+  },
+  "escenas": [
+    {
+      "id": "P1",
+      "texto": "Escena de entrada con dos caminos.",
+      "final": false,
+      "opciones": [
+        {
+          "id": "tomar_llave",
+          "texto": "Tomar la llave",
+          "destino": "P2",
+          "condiciones": {},
+          "efectos": {
+            "llave": true
+          }
+        },
+        {
+          "id": "ir",
+          "texto": "Ir directo",
+          "destino": "P2",
+          "condiciones": {},
+          "efectos": {}
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "texto": "Escena cuya única opción requiere la llave.",
+      "final": false,
+      "opciones": [
+        {
+          "id": "esperar",
+          "texto": "Esperar",
+          "destino": "P3",
+          "condiciones": {
+            "llave": true
+          },
+          "efectos": {}
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "texto": "Final de la historia de prueba.",
+      "final": true,
+      "opciones": []
+    }
+  ]
+}

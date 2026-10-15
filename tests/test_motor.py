@@ -142,5 +142,113 @@ class TestMotorNarrativo(unittest.TestCase):
         self.assertIn("[E6]", resultado)
 
 
+class TestBloqueo(unittest.TestCase):
+
+    def setUp(self):
+        ruta = (
+            Path(__file__).resolve().parent
+            / "historia_bloqueada.json"
+        )
+        self.historia = cargar_historia(ruta)
+
+    def test_bloqueo_informa_y_permite_reiniciar(self):
+        salida = StringIO()
+
+        # Ir directo deja P2 sin opciones habilitadas; desde el
+        # bloqueo se reinicia, se vuelve a P1 y se sale por el final.
+        entradas = ["2", "r", "1", "1", "s"]
+
+        with patch("builtins.input", side_effect=entradas):
+            with redirect_stdout(salida):
+                jugar(self.historia)
+
+        resultado = salida.getvalue()
+
+        self.assertIn("Partida bloqueada", resultado)
+        self.assertIn("'P2'", resultado)
+        self.assertIn("Reiniciando partida...", resultado)
+        self.assertIn("Fin de la transmisión.", resultado)
+
+    def test_deshacer_libera_el_bloqueo(self):
+        salida = StringIO()
+
+        # Ir directo bloquea P2; deshacer devuelve a P1 y elegir
+        # tomar la llave habilita de nuevo la escena.
+        entradas = ["2", "d", "1", "1", "s"]
+
+        with patch("builtins.input", side_effect=entradas):
+            with redirect_stdout(salida):
+                jugar(self.historia)
+
+        resultado = salida.getvalue()
+
+        self.assertIn("Partida bloqueada", resultado)
+        self.assertIn("'P2'", resultado)
+        self.assertIn("Decisión deshecha.", resultado)
+        self.assertEqual(resultado.count("Decisión deshecha."), 1)
+        self.assertIn("[P3]", resultado)
+
+
+    def test_U4_cantidad_de_opciones_incompatible_con_final(self):
+        historia_base = {
+            "titulo": "Prueba",
+            "inicio": "S1",
+            "variables": {},
+            "escenas": [
+                {
+                    "id": "S1",
+                    "texto": "Escena de entrada.",
+                    "final": False,
+                    "opciones": [
+                        {
+                            "id": "o1",
+                            "texto": "Opción única",
+                            "destino": "S2",
+                            "condiciones": {},
+                            "efectos": {},
+                        }
+                    ],
+                },
+                {"id": "S2", "texto": "Final.", "final": True, "opciones": []},
+            ],
+        }
+
+        variantes = [
+            ("no_final_sin_opciones", "debe tener al menos una opción."),
+            ("final_con_opciones", "no debe tener opciones."),
+        ]
+
+        for nombre, mensaje_esperado in variantes:
+            with self.subTest(variante=nombre):
+                historia = json.loads(json.dumps(historia_base))
+
+                if nombre == "no_final_sin_opciones":
+                    historia["escenas"][0]["opciones"] = []
+                else:
+                    historia["escenas"][1]["opciones"] = [
+                        {
+                            "id": "extra",
+                            "texto": "Opción en final",
+                            "destino": "S1",
+                            "condiciones": {},
+                            "efectos": {},
+                        }
+                    ]
+
+                errores = validar_historia(historia)
+
+                self.assertTrue(
+                    any(mensaje_esperado in error for error in errores),
+                    f"No se detectó: {mensaje_esperado}"
+                )
+                self.assertTrue(
+                    any(
+                        "S1" in error or "S2" in error
+                        for error in errores
+                    ),
+                    "El mensaje no identifica la escena."
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -31,6 +31,17 @@ def comprobar_condiciones(condiciones, variables):
 
 
 
+def escena_bloqueada(escena, variables):
+    """Indica si una escena no final no tiene ninguna opción habilitada."""
+    if escena["final"]:
+        return False
+
+    return not any(
+        comprobar_condiciones(opcion["condiciones"], variables)
+        for opcion in escena["opciones"]
+    )
+
+
 def jugar(historia):
     print(f"\n=== {historia['titulo']} ===")
 
@@ -90,6 +101,42 @@ def jugar(historia):
 
                 if comprobar_condiciones(condiciones, variables):
                     opciones_disponibles.append(opcion)
+
+            # Escena no final sin opciones habilitadas: partida bloqueada.
+            if escena_bloqueada(escena, variables):
+                print(
+                    "\nPartida bloqueada: ninguna opción está habilitada "
+                    f"en la escena '{escena['id']}'."
+                )
+                print("[d] Deshacer última decisión")
+                print("[r] Reiniciar partida")
+                print("[s] Salir")
+
+                respuesta = input("Selecciona una acción: ").strip().lower()
+
+                if respuesta == "d":
+                    if historial_deshacer is None:
+                        print("No hay ninguna decisión para deshacer.")
+                        continue
+
+                    escena_actual = historial_deshacer["escena"]
+                    variables = historial_deshacer["variables"].copy()
+
+                    historial_deshacer = None
+
+                    print("Decisión deshecha.")
+                    continue
+
+                if respuesta == "r":
+                    print("Reiniciando partida...")
+                    break
+
+                if respuesta == "s":
+                    print("Gracias por jugar. Fin de la transmisión.")
+                    return
+
+                print("Acción inválida. Intenta nuevamente.")
+                continue
 
             for numero, opcion in enumerate(
                 opciones_disponibles, start=1
@@ -205,6 +252,12 @@ def validar_historia(historia):
 
         if escena["final"] and opciones:
             errores.append(f"La escena final '{escena['id']}' no debe tener opciones.")
+
+        if not escena["final"] and not opciones:
+            errores.append(
+                f"La escena no final '{escena['id']}' debe tener "
+                "al menos una opción."
+            )
 
         ids_opciones = []
 

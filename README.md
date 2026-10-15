@@ -29,7 +29,7 @@ git --version
 ```text
 La-Ultima-Transmision/
 ├── data/
-│   ├── Historia.json
+│   ├── historia.json
 │   └── segunda_historia.json
 ├── docs/
 │   ├── RF-06-deshacer.md
@@ -43,7 +43,7 @@ La-Ultima-Transmision/
 ```
 
 - `src/main.py`: contiene el motor narrativo.
-- `data/Historia.json`: contiene la historia original.
+- `data/historia.json`: contiene la historia original.
 - `data/segunda_historia.json`: contiene una segunda historia.
 - `tests/test_motor.py`: contiene las pruebas automatizadas.
 - `docs/RF-06-deshacer.md`: documenta el requisito de deshacer.
@@ -76,7 +76,7 @@ No necesitas instalar dependencias externas si el proyecto utiliza únicamente l
 ### Ejecutar la historia original
 
 ```bash
-python src/main.py data/Historia.json
+python src/main.py data/historia.json
 ```
 
 ### Ejecutar la segunda historia
@@ -94,7 +94,7 @@ python -m py_compile src/main.py
 ### Validar el formato JSON de la historia original
 
 ```bash
-python -m json.tool data/Historia.json
+python -m json.tool data/historia.json
 ```
 
 ### Validar el formato JSON de la segunda historia
@@ -165,7 +165,7 @@ La historia original debe utilizarse para demostrar sus tres finales y el efecto
 | Efecto de una condición | Modificar una variable mediante una decisión y comprobar cómo afecta una opción posterior. |
 | Segunda historia | Ejecutar `python src/main.py data/segunda_historia.json`. |
 
-Las secuencias exactas de decisiones deben completarse después de recorrer `Historia.json` y verificar las rutas reales. No se deben inventar nombres de escenas ni decisiones.
+Las secuencias exactas de decisiones deben completarse después de recorrer `historia.json` y verificar las rutas reales. No se deben inventar nombres de escenas ni decisiones.
 
 ## 9. Control de versiones
 
