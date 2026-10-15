@@ -254,12 +254,18 @@ def validar_historia(historia):
     return errores
 
 
+    
 def main():
-    ruta = (
-        Path(__file__).resolve().parent.parent
-        / "data"
-        / "historia.json"
-    )
+    import sys
+
+    if len(sys.argv) > 1:
+        ruta = Path(sys.argv[1]).resolve()
+    else:
+        ruta = (
+            Path(__file__).resolve().parent.parent
+            / "data"
+            / "historia.json"
+        )
 
     try:
         historia = cargar_historia(ruta)

@@ -1,0 +1,82 @@
+{
+  "titulo": "La señal del refugio",
+  "inicio": "E1",
+  "variables": {
+    "codigo_verificado": false,
+    "rescate_enviado": false
+  },
+  "escenas": [
+    {
+      "id": "E1",
+      "texto": "Una tormenta azota la montaña. La operadora recibe una llamada desde un refugio aislado y decide establecer contacto.",
+      "final": false,
+      "opciones": [
+        {
+          "id": "establecer_contacto",
+          "texto": "Establecer contacto",
+          "destino": "E2",
+          "condiciones": {},
+          "efectos": {}
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "texto": "El refugio transmite un código de emergencia. La operadora puede verificarlo en el registro o continuar sin comprobarlo.",
+      "final": false,
+      "opciones": [
+        {
+          "id": "verificar_codigo",
+          "texto": "Verificar el código",
+          "destino": "E3",
+          "condiciones": {},
+          "efectos": {
+            "codigo_verificado": true
+          }
+        },
+        {
+          "id": "omitir_verificacion",
+          "texto": "Continuar sin verificar",
+          "destino": "E3",
+          "condiciones": {},
+          "efectos": {}
+        }
+      ]
+    },
+    {
+      "id": "E3",
+      "texto": "La operadora debe decidir cómo responder a la llamada de emergencia.",
+      "final": false,
+      "opciones": [
+        {
+          "id": "enviar_rescate",
+          "texto": "Enviar equipo de rescate",
+          "destino": "E4",
+          "condiciones": {
+            "codigo_verificado": true
+          },
+          "efectos": {
+            "rescate_enviado": true
+          }
+        },
+        {
+          "id": "cortar_senal",
+          "texto": "Cortar la señal",
+          "destino": "E4",
+          "condiciones": {
+            "codigo_verificado": false
+          },
+          "efectos": {
+            "rescate_enviado": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "E4",
+      "texto": "La operadora termina la transmisión. Si verificó el código, el equipo de rescate recibió una alerta confirmada; de lo contrario, la llamada quedó sin verificar.",
+      "final": true,
+      "opciones": []
+    }
+  ]
+}
