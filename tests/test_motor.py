@@ -142,5 +142,52 @@ class TestMotorNarrativo(unittest.TestCase):
         self.assertIn("[E6]", resultado)
 
 
+class TestBloqueo(unittest.TestCase):
+
+    def setUp(self):
+        ruta = (
+            Path(__file__).resolve().parent
+            / "historia_bloqueada.json"
+        )
+        self.historia = cargar_historia(ruta)
+
+    def test_bloqueo_informa_y_permite_reiniciar(self):
+        salida = StringIO()
+
+        # Ir directo deja P2 sin opciones habilitadas; desde el
+        # bloqueo se reinicia, se vuelve a P1 y se sale por el final.
+        entradas = ["2", "r", "1", "1", "s"]
+
+        with patch("builtins.input", side_effect=entradas):
+            with redirect_stdout(salida):
+                jugar(self.historia)
+
+        resultado = salida.getvalue()
+
+        self.assertIn("Partida bloqueada", resultado)
+        self.assertIn("'P2'", resultado)
+        self.assertIn("Reiniciando partida...", resultado)
+        self.assertIn("Fin de la transmisión.", resultado)
+
+    def test_deshacer_libera_el_bloqueo(self):
+        salida = StringIO()
+
+        # Ir directo bloquea P2; deshacer devuelve a P1 y elegir
+        # tomar la llave habilita de nuevo la escena.
+        entradas = ["2", "d", "1", "1", "s"]
+
+        with patch("builtins.input", side_effect=entradas):
+            with redirect_stdout(salida):
+                jugar(self.historia)
+
+        resultado = salida.getvalue()
+
+        self.assertIn("Partida bloqueada", resultado)
+        self.assertIn("'P2'", resultado)
+        self.assertIn("Decisión deshecha.", resultado)
+        self.assertEqual(resultado.count("Decisión deshecha."), 1)
+        self.assertIn("[P3]", resultado)
+
+
 if __name__ == "__main__":
     unittest.main()
