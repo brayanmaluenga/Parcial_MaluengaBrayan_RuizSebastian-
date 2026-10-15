@@ -3,4 +3,5 @@ __pycache__/
 .venv/
 venv/
 .env
-.pytest_cache/dist/
+.pytest_cache/
+dist/
