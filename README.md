@@ -5,8 +5,8 @@ Motor narrativo interactivo desarrollado en Python. Permite ejecutar historias a
 
 ## 1. Integrantes
 
-- Brayan Maluenga
-- Sebastian Ruiz
+- Brayan Alberto Maluenga Matute
+- Sebastian David Ruiz Ortega
 
 ## 2. Versiones requeridas
 
