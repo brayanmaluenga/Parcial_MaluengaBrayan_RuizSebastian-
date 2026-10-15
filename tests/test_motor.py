@@ -179,32 +179,32 @@ class TestMotorNarrativo(unittest.TestCase):
             (
                 "inicio_inexistente",
                 lambda h: h.update({"inicio": "E99"}),
-                "La escena inicial no existe.",
-                None,
+                "La escena inicial 'E99' no existe.",
+                "E99",
             ),
             (
                 "ids_escena_duplicados",
                 lambda h: h["escenas"].append(
                     json.loads(json.dumps(h["escenas"][0]))
                 ),
-                "identificadores de escena duplicados.",
-                None,
+                "identificadores de escena duplicados: E1.",
+                "E1",
             ),
             (
                 "ids_opcion_duplicados",
                 lambda h: h["escenas"][1]["opciones"][1].update(
                     {"id": "investigar"}
                 ),
-                "identificadores de opción duplicados en 'E2'.",
-                "E2",
+                "identificadores de opción duplicados en 'E2': investigar.",
+                "investigar",
             ),
             (
                 "destino_inexistente",
                 lambda h: h["escenas"][0]["opciones"][0].update(
                     {"destino": "E99"}
                 ),
-                "El destino de la opción 'revisar' no existe.",
-                "revisar",
+                "El destino 'E99' de la opción 'revisar' no existe.",
+                "E99",
             ),
             (
                 "variable_no_declarada",

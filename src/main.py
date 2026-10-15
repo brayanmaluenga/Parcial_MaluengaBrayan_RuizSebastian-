@@ -222,8 +222,18 @@ def validar_historia(historia):
 
         ids_escenas.append(escena["id"])
 
-    if len(ids_escenas) != len(set(ids_escenas)):
-        errores.append("Hay identificadores de escena duplicados.")
+    duplicados_escenas = sorted(
+        identificador
+        for identificador in set(ids_escenas)
+        if ids_escenas.count(identificador) > 1
+    )
+
+    if duplicados_escenas:
+        errores.append(
+            "Hay identificadores de escena duplicados: "
+            + ", ".join(duplicados_escenas)
+            + "."
+        )
 
     escenas_validas = {
         escena["id"]: escena
@@ -234,7 +244,10 @@ def validar_historia(historia):
 
     inicio = historia.get("inicio")
     if inicio not in escenas_validas:
-        errores.append("La escena inicial no existe.")
+        if inicio is None:
+            errores.append("La historia no indica la escena inicial.")
+        else:
+            errores.append(f"La escena inicial '{inicio}' no existe.")
 
     # Comprobar cada escena y sus opciones.
     for escena in escenas_validas.values():
@@ -277,7 +290,8 @@ def validar_historia(historia):
 
             if opcion.get("destino") not in escenas_validas:
                 errores.append(
-                    f"El destino de la opción '{id_opcion}' no existe."
+                    f"El destino '{opcion.get('destino')}' de la opción "
+                    f"'{id_opcion}' no existe."
                 )
 
             for campo in ("condiciones", "efectos"):
@@ -299,9 +313,16 @@ def validar_historia(historia):
                             f"El valor de '{nombre}' en '{id_opcion}' debe ser booleano."
                         )
 
-        if len(ids_opciones) != len(set(ids_opciones)):
+        duplicados_opciones = sorted(
+            identificador
+            for identificador in set(ids_opciones)
+            if ids_opciones.count(identificador) > 1
+        )
+
+        if duplicados_opciones:
             errores.append(
-                f"Hay identificadores de opción duplicados en '{escena['id']}'."
+                "Hay identificadores de opción duplicados en "
+                f"'{escena['id']}': {', '.join(duplicados_opciones)}."
             )
 
     return errores

@@ -151,19 +151,19 @@ def verificar_rnf2():
             (lambda h: h["escenas"][0].pop("final"), "debe indicar si es final."),
         ]),
         ("3_inicio_inexistente", [
-            (lambda h: h.update({"inicio": "E99"}), "La escena inicial no existe."),
+            (lambda h: h.update({"inicio": "E99"}), "La escena inicial 'E99' no existe."),
         ]),
         ("4_ids_escena_duplicados", [
             (lambda h: h["escenas"].append(json.loads(json.dumps(h["escenas"][0]))),
-             "identificadores de escena duplicados."),
+             "identificadores de escena duplicados: E1."),
         ]),
         ("5_ids_opcion_duplicados", [
             (lambda h: h["escenas"][1]["opciones"][1].update({"id": "investigar"}),
-             "identificadores de opción duplicados en 'E2'."),
+             "identificadores de opción duplicados en 'E2': investigar."),
         ]),
         ("6_destino_inexistente", [
             (lambda h: h["escenas"][0]["opciones"][0].update({"destino": "E99"}),
-             "El destino de la opción 'revisar' no existe."),
+             "El destino 'E99' de la opción 'revisar' no existe."),
         ]),
         ("7_variable_no_declarada", [
             (lambda h: h["escenas"][0]["opciones"][0].update({"efectos": {"fantasma": True}}),
