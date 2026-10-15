@@ -47,10 +47,11 @@ cambio solicitado. Los modelos citados son los de
    informe antes de entregar.**
 3. Los RF-01..05, 07 y 08 del informe no tienen criterios de aceptación
    explícitos (solo RF-06 los tiene en `docs/RF-06-deshacer.md`).
-4. **RNF-01 (tiempo de respuesta) está definido pero sin procedimiento ni
-   evidencia**; las verificaciones actuales (RNF-1 modificabilidad, RNF-2
-   claridad, RNF-3 confiabilidad de `scripts/verificar_rnf.py`) no miden tiempo.
-   Decidir: medirlo o sustituir ese RNF por el de modificabilidad ya verificado.
+4. **RNF-01 (tiempo de respuesta) verificado el 14-10** con la definición
+   exacta del informe: media 0,592 ms, p95 1,244 ms, máximo 4,468 ms y 100 %
+   de 1000 ejecuciones ≤ 1 s (requisito: ≥ 95 %). Procedimiento:
+   `verificar_rnf01_informe()` en `scripts/verificar_rnf.py`; resultados
+   añadidos (sin borrar lo previo) en `evidencias/verificacion_rnf.txt`.
 5. El RNF-02 del informe ("100% de un conjunto definido") se adopta aquí como el
    conjunto de las 9 categorías de la guía (verificado 9/9).
 6. `evidencias/resultados_pruebas.txt` (UTF-16, Windows de Brayan, 7 pruebas)
