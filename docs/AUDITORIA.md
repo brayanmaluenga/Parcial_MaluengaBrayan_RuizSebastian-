@@ -31,7 +31,7 @@ Comando: `python3 -m unittest discover -s tests -v`
 
 **En copia temporal con el nombre corregido a `historia.json`: 7/7 OK** (Ran 7 tests, 0.006 s). Esto confirma el resultado "7 pruebas correctas" que afirma `docs/trazabilidad.md:33` (tu compañero trabajó en Windows).
 
-> El fix es una línea (renombrar el archivo de datos o corregir las 2 rutas en `tests/test_motor.py:24-27` y `src/main.py:267`). **Pendiente de decisión** (ver §6).
+> **RESUELTO:** B1 corregido en `eda355c`. Suite completa actual: **18/18 OK** en Linux (`evidencias/resultados_pruebas_linux.txt`, regenerada con fecha/hora y versión de Python en commit `9b8bf32`).
 
 ## 3. Checklist contra la guía
 
@@ -45,10 +45,10 @@ Leyenda: ✅ listo · ⚠️ parcial · ❌ falta
 | Carga de JSON, estado inicial, escena actual, filtrado por condiciones | ✅ | `src/main.py:6-9` (carga), `:39-40` (estado), `:86-92` (filtro con `comprobar_condiciones`, `:21-30`) | Ninguna |
 | Elegir: aplica efectos y avanza | ✅ | `src/main.py:128-141` | Ninguna |
 | Finales + reinicio | ✅ | `src/main.py:51-84` (final), `:74-77` (reinicio restaura estado en `:38-41`) | Ninguna |
-| CA01 (E3 con conoce_origen → activar con código y cortar) | ✅ | flujo del motor + `data/Historia.json:50-82`; implícito en test_U6/I1 | Falta test explícito U1/CA01 |
-| CA02 (opción no habilitada rechazada aunque se envíe su id directo) | ⚠️ | Por diseño el motor solo acepta índices de la lista filtrada (`main.py:124-128`); **no hay API** para pasar id directo, pero **no hay test** que lo demuestre | Añadir aserción en U2/U3 |
-| CA03 (destino E99 → rechazo sin abrir sesión) | ⚠️ | `validar_historia` lo detecta (`main.py:225-228`) y `main()` valida antes de `jugar` (`:272-281`); test `test_detecta_destino_inexistente` existe pero **no verifica "sin abrir sesión"** | Añadir test (cae dentro de U4) |
-| Entrada inválida deja estado intacto | ✅ | `main.py:118-126` (rechaza antes de tocar `historial_deshacer`/variables); cubierto dentro de test_U6 (`"99"`) | Test U3 explícito falta |
+| CA01 (E3 con conoce_origen → activar con código y cortar) | ✅ corregido (`9b8bf32`) | `test_CA01_mostrar_exactamente_dos_opciones_en_e3`: verifica "1. Activar con código", "2. Cortar comunicación" y ausencia de "Activar sin verificar" | Ninguna |
+| CA02 (opción no habilitada rechazada aunque se envíe su id directo) | ✅ corregido (`9b8bf32`) | `test_CA02_opcion_no_habilitada_rechazada_id_directo`: enviar "activar_codigo" directo → "Entrada inválida" sin avanzar; además `comprobar_condiciones` devuelve False para esa opción | Ninguna |
+| CA03 (destino E99 → rechazo sin abrir sesión) | ✅ corregido (`9b8bf32`) | `test_CA03_destino_e99_rechazado_sin_abrir_sesion`: main() con copia E99 → "La historia contiene errores", sin "Validación correcta" y sin "[E1]" | Ninguna |
+| Entrada inválida deja estado intacto | ✅ corregido (`9b8bf32`) | `test_U3_entrada_invalida_deja_estado_intacto_y_preserva_historial`: opción 5 en E2 no avanza y deshacer regresa a E1 (historial no sustituido) | Ninguna |
 | Escena no final sin opciones habilitadas: informa bloqueo y permite reiniciar | ✅ corregido (commit `426e8a2`) | `escena_bloqueada()` expone el estado del motor y `jugar()` informa "Partida bloqueada..." con el ID de escena y ofrece deshacer/reiniciar/salir (`src/main.py:34-43,106-139`). Prueba: `TestBloqueo` con historia de prueba `tests/historia_bloqueada.json` | Implementado |
 | Interfaz de consola separada del motor | ⚠️ | Motor y consola están **en el mismo archivo** `src/main.py` (`jugar()` mezcla `print`/`input` con lógica). Separación lógica sí existe (motor/consola), pero no en módulos distintos | Ideal: separar en `motor.py` + `cli.py` (no obligatorio, refuerza arquitectura) |
 | Segunda historia (≥3 escenas, ≥1 condición, ≥1 efecto) sin tocar el motor | ✅ | `data/segunda_historia.json`: 4 escenas, 2 condiciones (`:55,66`), 2 efectos (`:33,58`); corre con el mismo `jugar()` | Ninguna |
@@ -68,21 +68,21 @@ Leyenda: ✅ listo · ⚠️ parcial · ❌ falta
 | 9. Cantidad de opciones incompatible con `final` | ✅ corregido (commit `4cc8423`) | Detecta final con opciones (`main.py:253-254`) **y** no-final con 0 opciones (`main.py:256-260`). Prueba parametrizada con `subTest`: `test_U4_cantidad_de_opciones_incompatible_con_final` | Implementado |
 | Mensaje con causa y campo/ID | ✅ | Todos los mensajes nombran campo e ID (`:227,241-247,250-252`) |
 
-**U4 parametrizada:** ❌ No existe ninguna prueba parametrizada (`rg "subTest|paramet" tests/` → 0).
+**U4 parametrizada:** ✅ `test_U4_validacion_nueve_categorias` (commit `9b8bf32`): 12 variantes con `subTest` (las 9 categorías; archivo ilegible vía `assertRaises` sobre `cargar_historia`); cada variante verifica fragmento de causa y campo/ID cuando el mensaje lo incluye.
 
-### C. Pruebas U1..U5 e I1
+### C. Pruebas U1..U5 e I1 — COMPLETA (commit `9b8bf32`, suite 18/18)
 
-| Caso guía | Estado | En `tests/test_motor.py` | Acción |
-|---|---|---|---|
-| U1 (condiciones habilitan solo las opciones correspondientes) | ❌ | No hay test con ese nombre ni aserción directa | Crear (~20 min) |
-| U2 (elección válida aplica efectos y avanza) | ❌ | Implícito en U6/I1 pero sin aserción directa de efectos | Crear (~20 min) |
-| U3 (opción inexistente/no habilitada deja estado intacto) | ⚠️ | Cubierto de pasada en test_U6 (`"99"` + mensaje), sin test propio | Crear (~20 min) |
-| U4 (errores obligatorios, parametrizada) | ❌ | Solo 3 variantes sueltas (`:34-66`), sin `subTest` | Crear parametrizada (~40 min) |
-| U5 (reinicio; versión extendida: elimina historial) | ⚠️ | `test_U5_reiniciar_elimina_el_historial` (`:106-123`) ✅ extended OK, pero **no aserta restauración de escena/variables iniciales** | Completar (~15 min) |
-| U6 (deshacer: restaura, consume nivel, entrada inválida preserva, nueva elección re-habilita) | ✅ | `test_U6_deshacer_restaurar_estado_y_consumir_historial` (`:69-104`), con variantes del anexo | Ninguna |
-| I1 (carga real + motor hasta un final; extendida con deshacer desde final) | ✅ | `test_I1_deshacer_desde_final_con_historia_cargada` (`:126-141`) | Ninguna |
+| Caso guía | Estado | Evidencia |
+|---|---|---|
+| U1 (condiciones habilitan solo las opciones correspondientes) | ✅ | `test_U1_condiciones_habilitan_solo_opciones_correspondientes` (subTest: E3 con 2 opciones habilitadas en cada estado de conoce_origen) |
+| U2 (elección válida aplica efectos y avanza) | ✅ | `test_U2_eleccion_valida_aplica_efectos_y_avanza` (E2→E3→E4; efecto probs. por opción habilitada "Activar con código") |
+| U3 (opción inexistente/no habilitada deja estado intacto + no sustituye historial) | ✅ | `test_U3_entrada_invalida_deja_estado_intacto_y_preserva_historial` + CA02 |
+| U4 (errores obligatorios, parametrizada) | ✅ | `test_U4_validacion_nueve_categorias` → ver nota de §B (subTest, 12 variantes) |
+| U5 (reinicio: restauración de escena/variables + eliminación de historial) | ✅ | `test_U5_reiniciar_elimina_el_historial` extendido: "[E1]" restaurado y "Activar sin verificar" visible tras reiniciar (variables en falso) |
+| U6 (deshacer: restaura, consume nivel, variantes del anexo) | ✅ | `test_U6_deshacer_...` (ejemplo anexo + entrada inválida + rehabilitación) + `test_U6_variantes_de_deshacer` (inicio sin retroceso, desde E4 y desde E6) |
+| I1 (carga real + motor + deshacer desde final; TRES finales) | ✅ | `test_I1_deshacer_desde_final_...` + `test_I1_recorre_los_tres_finales` (subTest E4/E5/E6) |
 
-**Resultado:** 7/7 pasan (con fix de mayúsculas). Faltan U1, U2, U3, U4-parametrizada y el refuerzo de U5.
+**Resultado:** 18/18 OK en Linux. Nota sobre el método de pruebas: el motor no expone un API de `elegir()` separado de la consola, por lo que U2/U3/I1 se verifican a través de `jugar()` con `input` simulado y aserciones sobre la salida (comportamiento observable).
 
 ### D. Solicitud de cambio (deshacer, un solo nivel)
 
@@ -106,21 +106,21 @@ Leyenda: ✅ listo · ⚠️ parcial · ❌ falta
 
 | Ítem | Estado | Evidencia / accion |
 |---|---|---|
-| README: integrantes con nombres completos | ❌ | `README.md:6-10` solo lista "Brayan Maluenga" (sin nombre completo ni a Sebastián) |
-| README: versiones, instalación, ejecución, pruebas, formato | ✅/⚠️ | `README.md:10-17,52-105,126-153`. ⚠️ instalación usa placeholder `URL_DEL_REPOSITORIO` (`:56`) y habla de carpeta `La-Ultima-Transmision/` (`:29,60`) que no coincide con el repo |
-| README: rutas exactas de cada final | ❌ | `README.md:157-167` lo deja "para completar después" — sin secuencias de decisión |
-| README: limitaciones | ✅ | `README.md:193-201` |
-| Informe PDF (máx 8 págs + anexo) | ❌ | No existe en el repo. **El .docx del compañero NO está en `docs/enunciado/` ni en ninguna parte del sistema** (buscado sin éxito). **No puedo verificar su contenido; hay que pedirle a Brayan el .docx.** |
-| Secciones informe por unidad (1-7) | ❌/no verificable | No verificable sin el .docx. En el repo solo existe contenido de la unidad 7 parcial (bibliotecas y licencias en `README.md:203-213`) y el cambio (unidad de gestión de cambio: RF-06 + trazabilidad parcial) |
-| Matriz de trazabilidad completa (RF/RNF → modelos → archivos → evidencia) | ⚠️ | `docs/trazabilidad.md` existe pero **solo cubre RF-06 del cambio**; no hay RF propios N01-N06 ni RNF ni modelos que trazar |
-| Commits de AMBOS integrantes | ❌ | Solo Brayan. **Sebastián debe hacer commits con su nombre/email configurados** |
-| Tag de versión previa al cambio | ⚠️ | No hay tag; solo el mensaje del commit `d146130`. Crear `git tag` es 1 min |
-| Capturas tablero Trello inicial/final | ❌ | Ausentes (no hay carpeta `evidencias/`; el README no la menciona en realidad — la mención estaba prevista pero no está) |
-| Registro de última ejecución de pruebas | ⚠️ | `docs/trazabilidad.md:33` afirma "7 pruebas correctas (OK)" pero **no hay archivo con la salida real**, y en Linux no se reproduce (bug mayúsculas) |
-| Verificación de los 3 RNF | ❌ | No hay RNF definidos ni verificación |
-| Video MP4 ≤ 6 min | ❌ | Ausente. Guion exigido: 3 finales, condición que cambia opciones, 2ª historia, error destino inexistente, pruebas, deshacer, decisión de arquitectura |
+| README: integrantes con nombres completos | ⚠️ | "Sebastián David Ruiz Ortega" completo; **Brayan queda como `[COMPLETAR NOMBRE COMPLETO DE BRAYAN]`** (pedirle el dato) |
+| README: versiones, instalación, ejecución, pruebas, formato | ✅ | README completo (commit `7b727d2`): URL real, ambas formas de unittest, contrato JSON equivalente al de la guía, verificado en clon limpio (todos los comandos ejecutados OK) |
+| README: rutas exactas de cada final | ✅ | §8 del README: E4=1,1,1; E5=1,2,1; E6=1,2,2; ejemplo de deshacer del anexo; segunda historia — todas verificadas por ejecución |
+| README: limitaciones | ✅ | §10: incluye un solo nivel de deshacer, sin rehacer, bloqueo |
+| Informe PDF (máx 8 págs + anexo) | ⚠️ | La evidencia **existe** ahora: `evidencias/Informe_parcial .pdf` (Brayan, `cec08d1`). Cubre unidades 1, 2, 4 (RF-01..08, 3 RNF, 3 preguntas, defecto), 6 (2 decisiones + separación) y 7 parcial. **Problemas: 10 páginas (la guía permite 8 de cuerpo); el nombre del archivo tiene un espacio; el conflicto del retroceso/acuerdo provisional NO está documentado; falta aprendizaje + acción de mejora; la declaración de IA solo se menciona de pasada en 1.6** |
+| Anexo con diagramas | ✅/⚠️ | `evidencias/Modelado_diagramas.pdf` (4 págs): los 5 modelos (contexto, casos de uso, clases, secuencia, estados) con descripciones. **No pude verificar visualmente los diagramas (solo su texto descriptivo)** |
+| Matriz de trazabilidad completa | ⚠️ | `docs/trazabilidad.md` sigue cubriendo solo RF-06; los RF-01..08 y RNF del informe aún no se mapean a modelos/archivos/evidencias |
+| Commits de AMBOS integrantes | ✅ | Desde `eda355c` en adelante hay commits de Sebastián Ruiz (sebaruizort@gmail.com), fusionados a main en `3d7edf8` |
+| Tag de versión previa al cambio | ⚠️ | Persistente: crear `git tag version-pre-cambio d146130` (1 min) |
+| Capturas tablero Trello inicial/final | ✅ | `evidencias/Trello_inical.png` y `Trello_final.png` (⚠️ typo en el nombre del archivo inicial) |
+| Registro de última ejecución de pruebas | ✅ | `evidencias/resultados_pruebas_linux.txt` (UTF-8, con fecha/hora/Python, 18/18 OK; `9b8bf32`). ⚠️ `historial_git.txt` queda desactualizado (UTF-16, solo hasta `66e2286`): regenerar en UTF-8 antes de entregar |
+| Verificación de los 3 RNF | ✅ | `scripts/verificar_rnf.py` → `evidencias/verificacion_rnf.txt`: RNF-1 modificabilidad 0 líneas en src/ (experimento vivo), RNF-2 9/9 categorías, RNF-3 0 fallos en 25 casos — **3/3 CUMPLEn** (`79777ea`) |
+| Video MP4 ≤ 6 min | ❌ | Ausente. Guion: 3 finales, condición que cambia opciones, 2ª historia, destino inexistente, pruebas, deshacer, decisión de arquitectura |
 | ZIP `Parcial_MaluengaBrayan_RuizSebastian.zip` | ❌ | Pendiente de generar al final |
-| Carpeta `evidencias/` | ❌ | No existe en el repo |
+| Carpeta `evidencias/` | ✅ | Existe y contiene: informe, diagramas, Trello x2, resultados de pruebas, diff del cambio, historial git (este último desactualizado) |
 
 ## 4. Bugs y riesgos en el código
 
@@ -136,20 +136,20 @@ Leyenda: ✅ listo · ⚠️ parcial · ❌ falta
 
 ## 5. Puntaje estimado (rúbrica, 100 pts)
 
-Con **solo lo verificable en el repo hoy**:
+**Actualizado tras la segunda ronda de correcciones (hora ~9):**
 
 | Criterio | Pts rúbrica | Estimado | Justificación breve |
 |---|---|---|---|
-| Problema y calidad | 10 | **0** | Nada de problema/actores/alcance/riesgos/responsabilidad profesional en el repo |
-| Proceso y agilidad | 10 | **0** | Sin backlog, tablero, prácticas, DoD ni aprendizaje |
-| Requerimientos | 20 | **2** | Solo RF-06 con criterios de aceptación (4 pts de CA parcial); no hay RF N01-N06, ni RNF, ni preguntas, ni defecto documentado |
-| Modelado | 15 | **0** | Sin los 5 modelos |
-| Arquitectura | 15 | **5** | Sin diagrama ni decisiones documentadas (0 de 10), pero la separación contenido/motor/interfaz está demostrada con la 2ª historia (5/5) |
-| Implementación y pruebas | 20 | **13** | Flujo 6/6; validaciones ~3/4 (falta categoría 9); U1-U5+I1 ~3/6 (solo U5, U6, I1); ejecución reproducible 1/2 (bug B1); RNF 0/2 |
-| Cambio y trazabilidad | 10 | **7** | Versión previa ✅ (2), comportamiento + pruebas ✅ (4), artefactos/trazabilidad ~1/4 (trazabilidad solo del cambio) |
-| **Total estimado hoy** | 100 | **≈ 27/100** | |
+| Problema y calidad | 10 | **10** | Informe §1: problema, actores, alcance, 2 riesgos con mitigación, priorización de calidad y responsabilidad profesional |
+| Proceso y agilidad | 10 | **6** | Proceso+alternativa y DoD completos; tablero con capturas inicial/final; faltan 2 prácticas explícitas (Kanban e incremental aparecen implícitas), aprendizaje y acción de mejora; backlog solo en el tablero |
+| Requerimientos | 20 | **17** | RF-01..08 cubren N01–N06; 3 RNF medibles **verificados con evidencia real**; 3 preguntas; defecto detectado y corregido (RF-06). Falta CA explícito por RF (2/4) |
+| Modelado | 15 | **13** | Los 5 modelos existen en `Modelado_diagramas.pdf` (2 c/u); coherencia alta pero no verificable visualmente (4/5) |
+| Arquitectura | 15 | **13** | 2 decisiones completas con alternativas/consecuencias y separación demostrada con la 2ª historia; el "diagrama" de componentes es textual, no gráfico (2/4) |
+| Implementación y pruebas | 20 | **20** | Flujo completo; las 9 categorías de validación con mensaje de causa y campo/ID; U1-U6+I1+CA01-03 con aserciones y suite 18/18 reproducible; RNF verificados (3/3) |
+| Cambio y trazabilidad | 10 | **7** | Versión previa (`d146130`), comportamiento nuevo verificado (4/4), diff del cambio en evidencias; falta análisis de impacto redactado y la matriz solo cubre RF-06 |
+| **Total estimado hoy** | 100 | **≈ 86/100** | Sube de ~27 inicial con las correcciones B1-B3, la cobertura de pruebas, el README, los RNF y la evidencia de Brayan |
 
-⚠️ **Advertencia importante:** si el .docx del compañero (que no encuentro en el sistema) ya contiene unidades 1-5, el puntaje potencial sube a ~70-80. **Primer paso: conseguir ese .docx.** Si no existe, hay que redactar todo el informe desde cero.
+**Lo que falta para subir a ~95-100:** video MP4 (requisito duro de la guía, sin él hay riesgo de descuento fuerte), ZIP final, nombre completo de Brayan, conflicto del retroceso documentado en el informe, aprendizaje + acción de mejora, matriz de trazabilidad completa, informe a ≤8 páginas de cuerpo, `historial_git.txt` regenerado en UTF-8 y tag `version-pre-cambio`.
 
 ## 6. Decisiones que necesitan confirmación
 
@@ -191,3 +191,17 @@ Commits de Sebastián Ruiz (sebaruizort@gmail.com), sin push:
 **Suite completa tras las correcciones: 10/10 OK en Linux** (`python -m unittest discover -v`; salida real guardada en `evidencias/resultados_pruebas_linux.txt`).
 
 Riesgo abierto: `evidencias/resultados_pruebas.txt` (UTF-16, de Brayan en Windows) corresponde a la versión **anterior** a B2/B3 (7 pruebas); la evidencia vigente es `resultados_pruebas_linux.txt`.
+
+## 9. Segunda ronda de correcciones (hora ~9, rama `sebastian/correcciones`)
+
+Tras la fusión del trabajo de Brayan en `main` (`3d7edf8`, que trajo informe, diagramas, Trello y diff del cambio), Sebastian completó la cobertura y la verificación:
+
+| Commit | Contenido |
+|---|---|
+| `9b8bf32` | **test:** U1, U2, U3, U4 (subTest, 9 categorías), variantes de U6 (inicio/E4/E6), I1 con los tres finales, CA01/CA02/CA03 + docstrings con el caso y salida real de la suite (18/18). Se plegó la U4 parcial de B3 en la U4 completa (sin duplicar) |
+| `7b727d2` | **docs:** README completo: nombres completos (Brayan pendiente de completar), URL real, contrato JSON equivalente al de la guía, §8 con rutas exactas de los 3 finales y del ejemplo de deshacer — **todas verificadas ejecutando el motor** — y verificación de los comandos en un clon limpio (`/tmp/clean`) |
+| `79777ea` | **test:** `scripts/verificar_rnf.py` → `evidencias/verificacion_rnf.txt`: RNF-1 (0 líneas en src/ por contenido nuevo, experimento vivo), RNF-2 (9/9), RNF-3 (0 fallos en 25 casos) — **3/3 CUMPLEn** |
+
+**Estado de la suite:** 18/18 OK en Linux. **Nota honesta:** el primer intento de RNF-1 marcó "NO CUMPLE" porque el commit histórico `ba32f1a` combinó contenido y motor; la métrica se reemplazó por un experimento vivo transparente (notado en el propio resultado). Un umbral incorrecto del script RNF-3 (no del motor) se corrigió tras medir los conteos reales.
+
+**Bugs encontrados en esta ronda (ninguno en `src/`, no se tocó):** el único hallazgo de calidad es que los mensajes de validación para "inicio inexistente" y "IDs de escena duplicados" mencionan la causa y el campo, pero no el **valor** del ID inexistente/duplicado (la guía pide campo/ID "cuando sea identificable" — cumple de forma justa; si se quisiera el valor exacto habría que tocar `src/main.py`).

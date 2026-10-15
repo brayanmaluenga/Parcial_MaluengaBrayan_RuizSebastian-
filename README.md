@@ -5,8 +5,8 @@ Motor narrativo interactivo desarrollado en Python. Permite ejecutar historias a
 
 ## 1. Integrantes
 
+- Sebastián David Ruiz Ortega
 - Brayan Alberto Maluenga Matute
-- Sebastian David Ruiz Ortega
 
 ## 2. Versiones requeridas
 
@@ -27,16 +27,19 @@ git --version
 ## 3. Estructura del proyecto
 
 ```text
-La-Ultima-Transmision/
+Parcial_MaluengaBrayan/
 ├── data/
 │   ├── historia.json
 │   └── segunda_historia.json
 ├── docs/
 │   ├── RF-06-deshacer.md
-│   └── trazabilidad.md
+│   ├── trazabilidad.md
+│   └── AUDITORIA.md
+├── evidencias/
 ├── src/
 │   └── main.py
 ├── tests/
+│   ├── historia_bloqueada.json
 │   └── test_motor.py
 ├── .gitignore
 └── README.md
@@ -54,11 +57,9 @@ La-Ultima-Transmision/
 
 ### Clonar el repositorio
 
-Reemplaza `URL_DEL_REPOSITORIO` por la URL real de GitHub.
-
 ```bash
-git clone URL_DEL_REPOSITORIO
-cd La-Ultima-Transmision
+git clone https://github.com/brayanmaluenga/Parcial_MaluengaBrayan.git
+cd Parcial_MaluengaBrayan
 ```
 
 Si ya tienes el proyecto descargado, abre la carpeta en Visual Studio Code y selecciona **Terminal > Nueva terminal**.
@@ -107,65 +108,96 @@ La validación sintáctica de JSON no garantiza que todos los destinos y variabl
 
 ## 6. Pruebas automatizadas
 
-Ejecuta las pruebas con:
+Ejecuta las pruebas con cualquiera de estos dos comandos equivalentes:
+
+```bash
+python -m unittest discover -v
+```
 
 ```bash
 python -m unittest discover -s tests -v
 ```
 
-Las pruebas contemplan funcionalidades como:
+La suite cubre los casos de la guía (U1 a U6, I1 y CA01 a CA03), el bloqueo
+de escenas sin opciones habilitadas y las variantes de deshacer del anexo.
+Cada prueba documenta su caso en el docstring; las parametrizadas usan
+`subTest`.
 
-- Detección de destinos inexistentes.
-- Detección de escenas duplicadas.
-- Detección de variables no declaradas.
-- Restauración del estado anterior al deshacer una decisión.
-- Eliminación del historial al reiniciar la partida.
-- Comportamiento de deshacer desde un estado final.
-
-Las pruebas deben ejecutarse después de realizar cambios importantes. Los resultados incluidos en la entrega deben corresponder a una ejecución real.
+Las pruebas deben ejecutarse después de realizar cambios importantes. Los
+resultados incluidos en la entrega corresponden a una ejecución real
+(`evidencias/resultados_pruebas_linux.txt`).
 
 ## 7. Formato del contenido narrativo
 
 Las historias se almacenan en archivos JSON independientes del código del motor.
+Este formato equivale al contrato JSON de la guía ("Elemento / Campos y significado").
 
-Conceptualmente, cada historia contiene:
+**Historia** (objeto raíz):
 
-- Identificación de la historia.
-- Escena inicial.
-- Escenas con identificadores únicos.
-- Textos narrativos.
-- Opciones disponibles.
-- Destinos asociados a las opciones.
-- Condiciones para habilitar opciones.
-- Efectos que modifican variables.
-- Escenas finales.
+| Campo | Tipo | Significado |
+|---|---|---|
+| `titulo` | texto | Título de la historia. |
+| `inicio` | ID de escena | Escena donde comienza cada partida. |
+| `variables` | mapa de booleanos | Valores iniciales del estado de la partida. |
+| `escenas` | lista de escenas | Todas las escenas (incluidas las finales). |
 
-Los nombres exactos de los campos y la estructura de las condiciones y los efectos deben coincidir con los definidos en `src/main.py`.
+**Escena**:
+
+| Campo | Tipo | Significado |
+|---|---|---|
+| `id` | texto | Identificador único de la escena. |
+| `texto` | texto | Contenido visible para el lector. |
+| `final` | booleano | Indica si la escena es un desenlace. |
+| `opciones` | lista de opciones | Vacía si la escena es final; al menos una si no lo es. |
+
+**Opción**:
+
+| Campo | Tipo | Significado |
+|---|---|---|
+| `id` | texto | Único dentro de la escena. |
+| `texto` | texto | Etiqueta visible en el menú. |
+| `destino` | ID de escena | Escena a la que se avanza (debe existir). |
+| `condiciones` | mapa de igualdades booleanas | Todas deben cumplirse para habilitar la opción; un mapa vacío la habilita siempre. |
+| `efectos` | mapa de asignaciones booleanas | Cambios sobre las variables al elegirla; un mapa vacío conserva las variables. |
+
+Las condiciones y los efectos solo admiten igualdades y asignaciones de
+verdadero/falso sobre variables declaradas en `variables`. No hay otras
+expresiones.
 
 ### Reglas del contenido
 
 1. Los identificadores de las escenas deben ser únicos.
 2. La escena inicial debe existir.
 3. Los destinos deben corresponder a escenas existentes.
-4. Las variables utilizadas deben respetar la estructura del motor.
-5. Las condiciones y los efectos deben seguir el formato admitido.
-6. Los archivos deben contener JSON válido y utilizar codificación UTF-8.
+4. Las variables utilizadas en condiciones y efectos deben estar declaradas.
+5. Las condiciones y los efectos deben ser booleanos.
+6. Las escenas finales deben tener cero opciones y las no finales al menos una.
+7. Los archivos deben contener JSON válido y utilizar codificación UTF-8.
 
-Se recomienda utilizar las historias existentes como referencia antes de crear una nueva.
+El validador (`validar_historia` en `src/main.py`) rechaza la historia antes de
+jugar si incumple cualquiera de estas reglas, con un mensaje que indica la causa
+y el campo o ID involucrado.
 
 ## 8. Rutas para demostrar los finales
 
-La historia original debe utilizarse para demostrar sus tres finales y el efecto de las condiciones sobre las opciones disponibles.
+Secuencias verificadas ejecutando el motor (cada valor es la tecla/opción que
+se elige en cada menú; los números corresponden al orden de las opciones
+habilitadas que aparecen en pantalla).
 
-| Demostración | Procedimiento |
+| Demostración | Secuencia en la historia original |
 |---|---|
-| Primer final | Ejecutar la historia original y elegir las opciones que conduzcan al primer final. |
-| Segundo final | Seguir el recorrido correspondiente al segundo final. |
-| Tercer final | Seguir el recorrido correspondiente al tercer final. |
-| Efecto de una condición | Modificar una variable mediante una decisión y comprobar cómo afecta una opción posterior. |
-| Segunda historia | Ejecutar `python src/main.py data/segunda_historia.json`. |
+| Final E4 (Rescate) | `1` (Revisar señal) → `1` (Investigar archivo) → `1` (Activar con código) → E4. Salir con `s`. |
+| Final E5 (El eco) | `1` (Revisar señal) → `2` (Continuar sin investigar) → `1` (Activar sin verificar) → E5. Salir con `s`. |
+| Final E6 (Silencio) | `1` (Revisar señal) → `2` (Continuar sin investigar) → `2` (Cortar comunicación) → E6. Salir con `s`. |
+| Efecto de una condición | Sin investigar, en E3 solo aparecen "Activar sin verificar" y "Cortar comunicación"; tras investigar (conoce_origen verdadero) aparece "Activar con código" en su lugar. |
+| Ejemplo de deshacer (anexo) | `1` (Revisar) → `1` (Investigar) → en E3, `d` regresa a E2 con conoce_origen falso → `d` se rechaza ("No hay ninguna decisión para deshacer") → `2` (Continuar sin investigar) → E3 muestra "Activar sin verificar" y "Cortar comunicación". |
+| Segunda historia | Ejecutar `python src/main.py data/segunda_historia.json`; por ejemplo `1` (Establecer contacto) → `1` (Verificar el código) → `1` (Enviar equipo de rescate) → E4, su final. |
 
-Las secuencias exactas de decisiones deben completarse después de recorrer `historia.json` y verificar las rutas reales. No se deben inventar nombres de escenas ni decisiones.
+Ejecución reproducible de una ruta (Linux/macOS):
+
+```bash
+printf '1\n1\n1\ns\n' | python src/main.py data/historia.json   # termina en E4
+```
 
 ## 9. Control de versiones
 
@@ -198,7 +230,10 @@ El historial permite revisar la evolución del código y recuperar versiones ant
 - La validación detecta únicamente los errores contemplados en el código.
 - Los recorridos dependen de las escenas, condiciones, efectos y destinos definidos.
 - Las pruebas automatizadas cubren los casos implementados, pero no garantizan la ausencia de todos los errores.
-- No se garantiza que el progreso de una partida se conserve entre ejecuciones.
+- No se garantiza que el progreso de una partida se conserve entre ejecuciones (no hay guardado).
+- El retroceso (deshacer) es de un solo nivel: no existe "rehacer" ni un historial de varios pasos.
+- Deshacer solo está disponible cuando hubo una elección válida previa; al iniciar o tras reiniciar no hay retroceso.
+- Si en una escena no final ninguna opción queda habilitada, la partida se informa como bloqueada y solo se puede deshacer, reiniciar o salir.
 - Los cambios en las reglas o en el formato de los datos pueden requerir actualizar el motor, las historias y las pruebas.
 
 ## 11. Bibliotecas y licencias

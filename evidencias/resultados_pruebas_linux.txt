@@ -1,15 +1,45 @@
-test_U4_cantidad_de_opciones_incompatible_con_final (tests.test_motor.TestBloqueo.test_U4_cantidad_de_opciones_incompatible_con_final) ... ok
-test_bloqueo_informa_y_permite_reiniciar (tests.test_motor.TestBloqueo.test_bloqueo_informa_y_permite_reiniciar) ... ok
-test_deshacer_libera_el_bloqueo (tests.test_motor.TestBloqueo.test_deshacer_libera_el_bloqueo) ... ok
-test_I1_deshacer_desde_final_con_historia_cargada (tests.test_motor.TestMotorNarrativo.test_I1_deshacer_desde_final_con_historia_cargada) ... ok
-test_U5_reiniciar_elimina_el_historial (tests.test_motor.TestMotorNarrativo.test_U5_reiniciar_elimina_el_historial) ... ok
-test_U6_deshacer_restaurar_estado_y_consumir_historial (tests.test_motor.TestMotorNarrativo.test_U6_deshacer_restaurar_estado_y_consumir_historial) ... ok
-test_detecta_destino_inexistente (tests.test_motor.TestMotorNarrativo.test_detecta_destino_inexistente) ... ok
-test_detecta_escenas_duplicadas (tests.test_motor.TestMotorNarrativo.test_detecta_escenas_duplicadas) ... ok
-test_detecta_variable_no_declarada (tests.test_motor.TestMotorNarrativo.test_detecta_variable_no_declarada) ... ok
-test_historia_del_profesor_es_valida (tests.test_motor.TestMotorNarrativo.test_historia_del_profesor_es_valida) ... ok
+# Última ejecución de la suite — 2026-10-14 22:06:59 -05
+# Python 3.14.7 | Linux 7.2.8-1-cachyos x86_64
+# Comando: python -m unittest discover -v
+
+test_bloqueo_informa_y_permite_reiniciar (tests.test_motor.TestBloqueo.test_bloqueo_informa_y_permite_reiniciar)
+Bloqueo (regla de la guía): informa y permite reiniciar sin bucle infinito. ... ok
+test_deshacer_libera_el_bloqueo (tests.test_motor.TestBloqueo.test_deshacer_libera_el_bloqueo)
+Bloqueo + deshacer: retroceder puede re-habilitar la escena. ... ok
+test_CA01_mostrar_exactamente_dos_opciones_en_e3 (tests.test_motor.TestMotorNarrativo.test_CA01_mostrar_exactamente_dos_opciones_en_e3)
+CA01: revisar + investigar deja la sesión en E3 con conoce_origen verdadero. ... ok
+test_CA02_opcion_no_habilitada_rechazada_id_directo (tests.test_motor.TestMotorNarrativo.test_CA02_opcion_no_habilitada_rechazada_id_directo)
+CA02: 'activar_codigo' no puede ejecutarse sin conocer el origen. ... ok
+test_CA03_destino_e99_rechazado_sin_abrir_sesion (tests.test_motor.TestMotorNarrativo.test_CA03_destino_e99_rechazado_sin_abrir_sesion)
+CA03: un destino E99 inexistente se rechaza sin abrir sesión. ... ok
+test_I1_deshacer_desde_final_con_historia_cargada (tests.test_motor.TestMotorNarrativo.test_I1_deshacer_desde_final_con_historia_cargada)
+I1 (extendida): carga real del archivo + deshacer desde un final. ... ok
+test_I1_recorre_los_tres_finales (tests.test_motor.TestMotorNarrativo.test_I1_recorre_los_tres_finales)
+I1 (extendida): con el archivo real, carga y decisiones hasta los tres finales. ... ok
+test_U1_condiciones_habilitan_solo_opciones_correspondientes (tests.test_motor.TestMotorNarrativo.test_U1_condiciones_habilitan_solo_opciones_correspondientes)
+U1: las condiciones habilitan únicamente las opciones correspondientes. ... ok
+test_U2_eleccion_valida_aplica_efectos_y_avanza (tests.test_motor.TestMotorNarrativo.test_U2_eleccion_valida_aplica_efectos_y_avanza)
+U2: una elección válida aplica los efectos y avanza al destino. ... ok
+test_U3_entrada_invalida_deja_estado_intacto_y_preserva_historial (tests.test_motor.TestMotorNarrativo.test_U3_entrada_invalida_deja_estado_intacto_y_preserva_historial)
+U3: una opción inexistente o no habilitada deja el estado intacto. ... ok
+test_U4_validacion_nueve_categorias (tests.test_motor.TestMotorNarrativo.test_U4_validacion_nueve_categorias)
+U4: los errores de contenido obligatorios producen diagnóstico controlado. ... ok
+test_U5_reiniciar_elimina_el_historial (tests.test_motor.TestMotorNarrativo.test_U5_reiniciar_elimina_el_historial)
+U5 (extendida): reiniciar restaura escena y variables iniciales y elimina el historial. ... ok
+test_U6_deshacer_restaurar_estado_y_consumir_historial (tests.test_motor.TestMotorNarrativo.test_U6_deshacer_restaurar_estado_y_consumir_historial)
+U6: deshacer restaura escena y variables y consume el retroceso. ... ok
+test_U6_variantes_de_deshacer (tests.test_motor.TestMotorNarrativo.test_U6_variantes_de_deshacer)
+U6 (variantes): reglas de deshacer según el anexo. ... ok
+test_detecta_destino_inexistente (tests.test_motor.TestMotorNarrativo.test_detecta_destino_inexistente)
+U4 (variante suelta): destino inexistente produce diagnóstico. ... ok
+test_detecta_escenas_duplicadas (tests.test_motor.TestMotorNarrativo.test_detecta_escenas_duplicadas)
+U4 (variante suelta): IDs de escena duplicados son detectados. ... ok
+test_detecta_variable_no_declarada (tests.test_motor.TestMotorNarrativo.test_detecta_variable_no_declarada)
+U4 (variante suelta): variable no declarada produce diagnóstico. ... ok
+test_historia_del_profesor_es_valida (tests.test_motor.TestMotorNarrativo.test_historia_del_profesor_es_valida)
+Validación previa: la historia real no produce errores. ... ok
 
 ----------------------------------------------------------------------
-Ran 10 tests in 0.011s
+Ran 18 tests in 0.033s
 
 OK
