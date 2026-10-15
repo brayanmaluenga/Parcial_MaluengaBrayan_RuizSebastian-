@@ -205,3 +205,20 @@ Tras la fusión del trabajo de Brayan en `main` (`3d7edf8`, que trajo informe, d
 **Estado de la suite:** 18/18 OK en Linux. **Nota honesta:** el primer intento de RNF-1 marcó "NO CUMPLE" porque el commit histórico `ba32f1a` combinó contenido y motor; la métrica se reemplazó por un experimento vivo transparente (notado en el propio resultado). Un umbral incorrecto del script RNF-3 (no del motor) se corrigió tras medir los conteos reales.
 
 **Bugs encontrados en esta ronda (ninguno en `src/`, no se tocó):** el único hallazgo de calidad es que los mensajes de validación para "inicio inexistente" y "IDs de escena duplicados" mencionan la causa y el campo, pero no el **valor** del ID inexistente/duplicado (la guía pide campo/ID "cuando sea identificable" — cumple de forma justa; si se quisiera el valor exacto habría que tocar `src/main.py`).
+
+## 10. Tercera ronda de cierre (hora ~10, rama `main`)
+
+| Commit | Contenido |
+|---|---|
+| `b34a101` (merge) | Integración de la segunda ronda en `main`, resolviendo el conflicto del README de `1c4ea4e` (Brayan) con mi versión completa: **ambos nombres completos** (Brayan Alberto Maluenga Matute / Sebastián David Ruiz Ortega) |
+| `2841dc8` | **fix:** los mensajes de "inicio inexistente" e "IDs de escena/opción duplicados" y "destino inexistente" ahora incluyen el valor exacto del ID (p. ej. `'E99'`, `: E1`, `: investigar`); U4 ajustada y suite 18/18; RNF-2 sigue 9/9 |
+| tags | `version-pre-cambio` → `d146130` (sin deshacer en src/: verificado con `git show d146130:src/main.py`), `version-post-cambio` → `41c4686` (deshacer implementado). Push pendiente de decisión |
+| `5c26d6b` | **docs:** matriz de trazabilidad completa (RF-01..08 → N01-N06/cambio, 3 RNF) con **hallazgos honestos**: el informe no mapea sus RF a necesidades, sigue citando `Historia.json`, sus RF carecen de CA y **RNF-01 (tiempo) no tiene verificación**; + test de la segunda historia (suite 19/19) |
+| `b67db48` | **docs:** historial Git exportado en UTF-8 (24 commits, ambos autores; el viejo era UTF-16 con 8 commits) |
+| `2a626f6` | **docs:** guion del video `docs/guion_video.md` con comandos verificados, textos en pantalla, reparto equitativo y tiempos (5:30) |
+| `b8c4de3` | **feat:** `scripts/empaquetar.py` → `dist/Parcial_MaluengaBrayan_RuizSebastian.zip` (probado: 22 rutas, 1571 KiB, suite 19/19 dentro del ZIP; aviso si falta el video) |
+| checklist | `docs/checklist_entrega.md`: lista de revisión de la guía marcada con evidencia y pendientes bloqueantes |
+
+**Hallazgo del conflicto README:** la fusión reveló consulta pendiente — el informe mantiene referencias obsoletas a `data/Historia.json` y no documenta el conflicto del retroceso; ver `docs/trazabilidad.md` (hallazgos) y `docs/checklist_entrega.md`.
+
+**Puntaje:** sin cambios sustanciales respecto a §5 (≈86); la matriz y los mensajes mejorados no alteran la nota, lo que mueve la aguja es el video, el informe a 8 págs y su contenido faltante.

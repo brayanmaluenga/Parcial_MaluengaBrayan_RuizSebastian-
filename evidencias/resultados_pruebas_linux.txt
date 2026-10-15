@@ -1,4 +1,4 @@
-# Última ejecución de la suite — 2026-10-14 22:22:51 -05
+# Última ejecución de la suite — 2026-10-14 22:26:01 -05
 # Python 3.14.7 | Linux 7.2.8-1-cachyos x86_64
 # Comando: python -m unittest discover -v
 
@@ -42,6 +42,6 @@ test_historia_del_profesor_es_valida (tests.test_motor.TestMotorNarrativo.test_h
 Validación previa: la historia real no produce errores. ... ok
 
 ----------------------------------------------------------------------
-Ran 19 tests in 0.035s
+Ran 19 tests in 0.065s
 
 OK
