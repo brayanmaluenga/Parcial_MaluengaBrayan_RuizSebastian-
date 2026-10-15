@@ -189,5 +189,66 @@ class TestBloqueo(unittest.TestCase):
         self.assertIn("[P3]", resultado)
 
 
+    def test_U4_cantidad_de_opciones_incompatible_con_final(self):
+        historia_base = {
+            "titulo": "Prueba",
+            "inicio": "S1",
+            "variables": {},
+            "escenas": [
+                {
+                    "id": "S1",
+                    "texto": "Escena de entrada.",
+                    "final": False,
+                    "opciones": [
+                        {
+                            "id": "o1",
+                            "texto": "Opción única",
+                            "destino": "S2",
+                            "condiciones": {},
+                            "efectos": {},
+                        }
+                    ],
+                },
+                {"id": "S2", "texto": "Final.", "final": True, "opciones": []},
+            ],
+        }
+
+        variantes = [
+            ("no_final_sin_opciones", "debe tener al menos una opción."),
+            ("final_con_opciones", "no debe tener opciones."),
+        ]
+
+        for nombre, mensaje_esperado in variantes:
+            with self.subTest(variante=nombre):
+                historia = json.loads(json.dumps(historia_base))
+
+                if nombre == "no_final_sin_opciones":
+                    historia["escenas"][0]["opciones"] = []
+                else:
+                    historia["escenas"][1]["opciones"] = [
+                        {
+                            "id": "extra",
+                            "texto": "Opción en final",
+                            "destino": "S1",
+                            "condiciones": {},
+                            "efectos": {},
+                        }
+                    ]
+
+                errores = validar_historia(historia)
+
+                self.assertTrue(
+                    any(mensaje_esperado in error for error in errores),
+                    f"No se detectó: {mensaje_esperado}"
+                )
+                self.assertTrue(
+                    any(
+                        "S1" in error or "S2" in error
+                        for error in errores
+                    ),
+                    "El mensaje no identifica la escena."
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

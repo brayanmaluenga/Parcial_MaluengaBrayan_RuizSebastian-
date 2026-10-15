@@ -253,6 +253,12 @@ def validar_historia(historia):
         if escena["final"] and opciones:
             errores.append(f"La escena final '{escena['id']}' no debe tener opciones.")
 
+        if not escena["final"] and not opciones:
+            errores.append(
+                f"La escena no final '{escena['id']}' debe tener "
+                "al menos una opción."
+            )
+
         ids_opciones = []
 
         for opcion in opciones:
