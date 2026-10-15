@@ -87,6 +87,27 @@ class TestMotorNarrativo(unittest.TestCase):
             any("duplicados" in error.lower() for error in errores)
         )
 
+    def test_RF08_segunda_historia_sin_modificar_el_motor(self):
+        """RF-08: la segunda historia carga y corre con el mismo motor.
+
+        Verifica la separación contenido/motor: un archivo JSON nuevo
+        con sus propias escenas, condiciones y efectos funciona sin
+        tocar src/.
+        """
+        ruta = (
+            Path(__file__).resolve().parent.parent
+            / "data"
+            / "segunda_historia.json"
+        )
+        historia = cargar_historia(ruta)
+
+        self.assertEqual(validar_historia(historia), [])
+
+        resultado = ejecutar(historia, ["1", "1", "1", "s"])
+
+        self.assertIn("La señal del refugio", resultado)
+        self.assertIn("[E4]", resultado)
+
     def test_U1_condiciones_habilitan_solo_opciones_correspondientes(self):
         """U1: las condiciones habilitan únicamente las opciones correspondientes.
 

@@ -1,4 +1,4 @@
-# Última ejecución de la suite — 2026-10-14 22:21:24 -05
+# Última ejecución de la suite — 2026-10-14 22:22:51 -05
 # Python 3.14.7 | Linux 7.2.8-1-cachyos x86_64
 # Comando: python -m unittest discover -v
 
@@ -16,6 +16,8 @@ test_I1_deshacer_desde_final_con_historia_cargada (tests.test_motor.TestMotorNar
 I1 (extendida): carga real del archivo + deshacer desde un final. ... ok
 test_I1_recorre_los_tres_finales (tests.test_motor.TestMotorNarrativo.test_I1_recorre_los_tres_finales)
 I1 (extendida): con el archivo real, carga y decisiones hasta los tres finales. ... ok
+test_RF08_segunda_historia_sin_modificar_el_motor (tests.test_motor.TestMotorNarrativo.test_RF08_segunda_historia_sin_modificar_el_motor)
+RF-08: la segunda historia carga y corre con el mismo motor. ... ok
 test_U1_condiciones_habilitan_solo_opciones_correspondientes (tests.test_motor.TestMotorNarrativo.test_U1_condiciones_habilitan_solo_opciones_correspondientes)
 U1: las condiciones habilitan únicamente las opciones correspondientes. ... ok
 test_U2_eleccion_valida_aplica_efectos_y_avanza (tests.test_motor.TestMotorNarrativo.test_U2_eleccion_valida_aplica_efectos_y_avanza)
@@ -40,6 +42,6 @@ test_historia_del_profesor_es_valida (tests.test_motor.TestMotorNarrativo.test_h
 Validación previa: la historia real no produce errores. ... ok
 
 ----------------------------------------------------------------------
-Ran 18 tests in 0.060s
+Ran 19 tests in 0.035s
 
 OK
