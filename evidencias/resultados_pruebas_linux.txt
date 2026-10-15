@@ -1,0 +1,15 @@
+test_U4_cantidad_de_opciones_incompatible_con_final (tests.test_motor.TestBloqueo.test_U4_cantidad_de_opciones_incompatible_con_final) ... ok
+test_bloqueo_informa_y_permite_reiniciar (tests.test_motor.TestBloqueo.test_bloqueo_informa_y_permite_reiniciar) ... ok
+test_deshacer_libera_el_bloqueo (tests.test_motor.TestBloqueo.test_deshacer_libera_el_bloqueo) ... ok
+test_I1_deshacer_desde_final_con_historia_cargada (tests.test_motor.TestMotorNarrativo.test_I1_deshacer_desde_final_con_historia_cargada) ... ok
+test_U5_reiniciar_elimina_el_historial (tests.test_motor.TestMotorNarrativo.test_U5_reiniciar_elimina_el_historial) ... ok
+test_U6_deshacer_restaurar_estado_y_consumir_historial (tests.test_motor.TestMotorNarrativo.test_U6_deshacer_restaurar_estado_y_consumir_historial) ... ok
+test_detecta_destino_inexistente (tests.test_motor.TestMotorNarrativo.test_detecta_destino_inexistente) ... ok
+test_detecta_escenas_duplicadas (tests.test_motor.TestMotorNarrativo.test_detecta_escenas_duplicadas) ... ok
+test_detecta_variable_no_declarada (tests.test_motor.TestMotorNarrativo.test_detecta_variable_no_declarada) ... ok
+test_historia_del_profesor_es_valida (tests.test_motor.TestMotorNarrativo.test_historia_del_profesor_es_valida) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.011s
+
+OK
