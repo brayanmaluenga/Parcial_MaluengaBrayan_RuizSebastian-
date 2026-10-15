@@ -11,6 +11,7 @@ import json
 import subprocess
 import sys
 import tempfile
+import time
 from contextlib import redirect_stdout
 from datetime import datetime
 from pathlib import Path
@@ -297,12 +298,73 @@ def verificar_rnf3():
     return fallos == 0, metrica, resultados
 
 
+def verificar_rnf01_informe():
+    """RNF-01 del informe: procesar una decision valida y mostrar la siguiente
+    escena en <= 1 s en >= 95 % de ejecuciones, excluyendo la escritura del
+    usuario. Se ejecuta N=1000 decisiones (mas estricto que las 100 del
+    informe) aplicando la misma regla de aceptacion.
+    """
+    historia = {
+        "titulo": "Historia de tiempo RNF-01",
+        "inicio": "X1",
+        "variables": {},
+        "escenas": [
+            {
+                "id": "X1",
+                "texto": "Unica escena con una opcion.",
+                "final": False,
+                "opciones": [
+                    {
+                        "id": "o1",
+                        "texto": "Avanzar",
+                        "destino": "X2",
+                        "condiciones": {},
+                        "efectos": {},
+                    }
+                ],
+            },
+            {"id": "X2", "texto": "Escena siguiente.", "final": True, "opciones": []},
+        ],
+    }
+
+    n = 1000
+    tiempos_ms = []
+    for _ in range(n):
+        inicio = time.perf_counter()
+        ejecutar(historia, ["1", "s"])  # 1 decision valida + escena siguiente
+        tiempos_ms.append((time.perf_counter() - inicio) * 1000.0)
+
+    tiempos_ms.sort()
+    media = sum(tiempos_ms) / n
+    p95 = tiempos_ms[int(n * 0.95) - 1]
+    maximo = tiempos_ms[-1]
+    bajo_umbral = sum(1 for t in tiempos_ms if t <= 1000.0)
+    fraccion = bajo_umbral / n
+
+    detalles = [
+        "  a) Definicion exacta del informe (seccion 3.2, sin cambiarla): "
+        "'el sistema debera procesar una decision valida y mostrar la siguiente "
+        "escena en un maximo de un segundo en al menos el 95 % de 100 ejecuciones "
+        "automatizadas, excluyendo el tiempo de escritura del usuario.'",
+        f"  b) Datos: N={n} decisiones validas procesadas por jugar() con entrada "
+        "simulada (excluye la escritura del usuario, como pide la definicion).",
+        f"  c) Tiempo medio = {media:.3f} ms | p95 = {p95:.3f} ms | maximo = {maximo:.3f} ms.",
+        f"  d) Resultado contra el umbral del informe: {bajo_umbral}/{n} ejecuciones "
+        f"({fraccion * 100:.1f} %) quedaron en <= 1000 ms (requiere >= 95 %).",
+    ]
+    cumple = fraccion >= 0.95
+    metrica = f"{fraccion * 100:.1f} % de ejecuciones <= 1 s (umbral del informe: >= 95 %)"
+    return cumple, metrica, detalles
+
+
 def main():
     lineas = [
-        "Verificacion de los 3 RNF — La ultima transmision",
-        f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"=== Ejecucion de verificacion — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===",
         f"Python: {sys.version.split()[0]} | SO: {sys.platform}",
-        "Script: scripts/verificar_rnf.py (procedimiento reproducible)",
+        "Script: scripts/verificar_rnf.py",
+        "Nota de etiquetas: 'RNF-1/RNF-2/RNF-3' de este script son las "
+        "verificaciones de modificabilidad/claridad/confiabilidad; el "
+        "RNF-01 del INFORME (tiempo de respuesta) se verifica aparte.",
         "",
     ]
 
@@ -310,6 +372,7 @@ def main():
         ("RNF-1", "Modificabilidad", verificar_rnf1),
         ("RNF-2", "Claridad de errores", verificar_rnf2),
         ("RNF-3", "Confiabilidad", verificar_rnf3),
+        ("RNF-01 del informe", "Tiempo de respuesta", verificar_rnf01_informe),
     ]:
         try:
             cumple, metrica, detalles = verificar()
@@ -322,7 +385,11 @@ def main():
         lineas.append("")
 
     destino = RAIZ / "evidencias" / "verificacion_rnf.txt"
-    destino.write_text("\n".join(lineas), encoding="utf-8")
+    previa = destino.read_text(encoding="utf-8") if destino.exists() else ""
+    destino.write_text(
+        (previa.rstrip("\n") + "\n\n" if previa else "") + "\n".join(lineas) + "\n",
+        encoding="utf-8",
+    )  # agrega a lo existente, sin borrar ejecuciones previas
     print("\n".join(lineas))
 
 

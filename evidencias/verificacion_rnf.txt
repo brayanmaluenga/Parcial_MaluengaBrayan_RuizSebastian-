@@ -30,3 +30,45 @@ RNF-3 Confiabilidad
   a) 20 entradas invalidas en E2: sin excepciones, estado intacto (OK), despues deshacer regresa a E1 y la partida continua hasta [E6].
   b) 3 archivos JSON malformados: rechazo controlado (json.JSONDecodeError), sin abrir sesion.
   c) 2 historias con claves faltantes: rechazadas por el validador con diagnostico, sin exceptiones.
+
+=== Ejecucion de verificacion — 2026-10-14 22:33:31 ===
+Python: 3.14.7 | SO: linux
+Script: scripts/verificar_rnf.py
+Nota de etiquetas: 'RNF-1/RNF-2/RNF-3' de este script son las verificaciones de modificabilidad/claridad/confiabilidad; el RNF-01 del INFORME (tiempo de respuesta) se verifica aparte.
+
+RNF-1 Modificabilidad
+  Resultado: CUMPLE
+  Metrica: lineas de codigo src/ modificadas para agregar una historia = 0
+  a) Segunda historia con el mismo motor: validacion=OK, partida=llega a su final [E4] OK
+  b) Nota: el commit ba32f1a combino la segunda historia con cambios en src/ (11+5 lineas), por eso se usa un experimento vivo.
+  c) Experimento: se agrego data/historia_temporal.json (escenas Q*, condicion nueva) a una copia del repo; src/main.py identico byte a byte (True), la historia carga y corre hasta [Q3] (True).
+
+RNF-2 Claridad de errores
+  Resultado: CUMPLE
+  Metrica: 9/9 categorias con mensaje de causa + campo/ID
+  1_estructura_incorrecta: OK (mensaje con causa y campo/ID)
+  2_campos_obligatorios_ausentes: OK (mensaje con causa y campo/ID)
+  3_inicio_inexistente: OK (mensaje con causa y campo/ID)
+  4_ids_escena_duplicados: OK (mensaje con causa y campo/ID)
+  5_ids_opcion_duplicados: OK (mensaje con causa y campo/ID)
+  6_destino_inexistente: OK (mensaje con causa y campo/ID)
+  7_variable_no_declarada: OK (mensaje con causa y campo/ID)
+  8_valor_no_booleano: OK (mensaje con causa y campo/ID)
+  9_cantidad_opciones_vs_final: OK (mensaje con causa y campo/ID)
+  archivo_ilegible: OK (rechazo controlado): JSONDecodeError
+
+RNF-3 Confiabilidad
+  Resultado: CUMPLE
+  Metrica: 0 fallos en 25 entradas/casos invalidos
+  a) 20 entradas invalidas en E2: sin excepciones, estado intacto (OK), despues deshacer regresa a E1 y la partida continua hasta [E6].
+  b) 3 archivos JSON malformados: rechazo controlado (json.JSONDecodeError), sin abrir sesion.
+  c) 2 historias con claves faltantes: rechazadas por el validador con diagnostico, sin exceptiones.
+
+RNF-01 del informe Tiempo de respuesta
+  Resultado: CUMPLE
+  Metrica: 100.0 % de ejecuciones <= 1 s (umbral del informe: >= 95 %)
+  a) Definicion exacta del informe (seccion 3.2, sin cambiarla): 'el sistema debera procesar una decision valida y mostrar la siguiente escena en un maximo de un segundo en al menos el 95 % de 100 ejecuciones automatizadas, excluyendo el tiempo de escritura del usuario.'
+  b) Datos: N=1000 decisiones validas procesadas por jugar() con entrada simulada (excluye la escritura del usuario, como pide la definicion).
+  c) Tiempo medio = 0.592 ms | p95 = 1.244 ms | maximo = 4.468 ms.
+  d) Resultado contra el umbral del informe: 1000/1000 ejecuciones (100.0 %) quedaron en <= 1000 ms (requiere >= 95 %).
+
