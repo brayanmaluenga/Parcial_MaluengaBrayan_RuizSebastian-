@@ -26,7 +26,7 @@ cambio solicitado. Los modelos citados son los de
 
 | ID | Relación | Modelo | Componente o archivo | Prueba | Evidencia |
 |---|---|---|---|---|---|
-| RNF-01 Tiempo de respuesta: decisión procesada y escena mostrada en ≤1 s en ≥95% de 100 ejecuciones | Fluidez de uso / N02 | Estados de una sesión | `src/main.py` — `jugar()` | ⚠️ **SIN VERIFICAR**: no hay procedimiento ni medición registrada. Pendiente de medir o de renegociar el RNF | — |
+| RNF-01 Tiempo de respuesta: decisión válida procesada y escena mostrada en ≤1 s en ≥95% de ejecuciones | Fluidez de uso / N02 | Estados de una sesión | `src/main.py` — `jugar()` | `scripts/verificar_rnf.py` — `verificar_rnf01_informe()` (N=1000, definición del informe sin cambiar) | `evidencias/verificacion_rnf.txt` (14-10: media 0,592 ms; p95 1,244 ms; máx 4,468 ms; **100% ≤ 1 s → CUMPLE**) |
 | RNF-02 Detección del 100% de los errores del conjunto definido | N06 (claridad de errores) | Casos de uso | `src/main.py` — `validar_historia()` | `test_U4_validacion_nueve_categorias` | `evidencias/verificacion_rnf.txt` (RNF-2: 9/9 categorías de la guía) |
 | RNF-03 Compatibilidad: dos historias JSON sin modificar el motor | N01 (modificabilidad) | Componentes | `src/main.py` + `data/segunda_historia.json` | `test_RF08_segunda_historia_sin_modificar_el_motor` | `evidencias/verificacion_rnf.txt` (RNF-1) |
 
