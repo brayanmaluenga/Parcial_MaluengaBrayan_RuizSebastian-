@@ -1,0 +1,32 @@
+Verificacion de los 3 RNF — La ultima transmision
+Fecha: 2026-10-14 22:11:57
+Python: 3.14.7 | SO: linux
+Script: scripts/verificar_rnf.py (procedimiento reproducible)
+
+RNF-1 Modificabilidad
+  Resultado: CUMPLE
+  Metrica: lineas de codigo src/ modificadas para agregar una historia = 0
+  a) Segunda historia con el mismo motor: validacion=OK, partida=llega a su final [E4] OK
+  b) Nota: el commit ba32f1a combino la segunda historia con cambios en src/ (11+5 lineas), por eso se usa un experimento vivo.
+  c) Experimento: se agrego data/historia_temporal.json (escenas Q*, condicion nueva) a una copia del repo; src/main.py identico byte a byte (True), la historia carga y corre hasta [Q3] (True).
+
+RNF-2 Claridad de errores
+  Resultado: CUMPLE
+  Metrica: 9/9 categorias con mensaje de causa + campo/ID
+  1_estructura_incorrecta: OK (mensaje con causa y campo/ID)
+  2_campos_obligatorios_ausentes: OK (mensaje con causa y campo/ID)
+  3_inicio_inexistente: OK (mensaje con causa y campo/ID)
+  4_ids_escena_duplicados: OK (mensaje con causa y campo/ID)
+  5_ids_opcion_duplicados: OK (mensaje con causa y campo/ID)
+  6_destino_inexistente: OK (mensaje con causa y campo/ID)
+  7_variable_no_declarada: OK (mensaje con causa y campo/ID)
+  8_valor_no_booleano: OK (mensaje con causa y campo/ID)
+  9_cantidad_opciones_vs_final: OK (mensaje con causa y campo/ID)
+  archivo_ilegible: OK (rechazo controlado): JSONDecodeError
+
+RNF-3 Confiabilidad
+  Resultado: CUMPLE
+  Metrica: 0 fallos en 25 entradas/casos invalidos
+  a) 20 entradas invalidas en E2: sin excepciones, estado intacto (OK), despues deshacer regresa a E1 y la partida continua hasta [E6].
+  b) 3 archivos JSON malformados: rechazo controlado (json.JSONDecodeError), sin abrir sesion.
+  c) 2 historias con claves faltantes: rechazadas por el validador con diagnostico, sin exceptiones.
